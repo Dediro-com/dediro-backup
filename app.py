@@ -105,15 +105,21 @@ async def check_s3_and_process():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("Starting scheduler setup...")
     scheduler = AsyncIOScheduler(timezone='UTC')
 
     # Schedule the task every 30 seconds
-    scheduler.add_job(check_s3_and_process, 'interval', seconds=30)
+    scheduler.add_job(check_s3_and_process, 'interval', seconds=10)
+    print("Scheduled check_s3_and_process job every 10 seconds.")
+    
     scheduler.start()
+    print("Scheduler started.")
 
     yield
 
+    print("Shutting down scheduler...")
     scheduler.shutdown()
+    print("Scheduler shut down.")
 
 app = FastAPI(lifespan=lifespan)
 
