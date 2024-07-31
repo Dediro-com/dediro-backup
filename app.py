@@ -78,6 +78,7 @@ def upload_json_to_mongodb(file_path, mongo_uri, database_name):
     result = collection.insert_one(data)
     print(f"Document from {file_path} inserted into collection '{collection_name}' with ID: {result.inserted_id}")
 
+
 # Function to check for new S3 objects and process them
 async def check_s3_and_process():
     try:
@@ -126,6 +127,9 @@ async def lifespan(app: FastAPI):
     print("Scheduler shut down.")
 
 app = FastAPI(lifespan=lifespan)
+@app.get("/")
+async def read_root():
+    return {"message": "Server is running"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, log_level="debug")
