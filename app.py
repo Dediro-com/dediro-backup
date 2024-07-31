@@ -10,6 +10,6 @@ async def main():
     scheduler.start()
     print("Scheduler started.")
     
-    await asyncio.sleep(20)  # Keep the script running for a while
+    await asyncio.sleep(1)  # Keep the script running for a while
 
 asyncio.run(main())
