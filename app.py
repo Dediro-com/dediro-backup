@@ -80,27 +80,31 @@ def upload_json_to_mongodb(file_path, mongo_uri, database_name):
 
 # Function to check for new S3 objects and process them
 async def check_s3_and_process():
-    print("Checking for new S3 objects...")
-    existing_objects = load_existing_metadata(csv_file_path)
-    current_objects = list_s3_objects(bucket_name)
-    print(f"Found {len(current_objects)} objects in S3 bucket.")
-    new_objects = [obj for obj in current_objects if obj['Key'] not in existing_objects]
+    try:
+        print("Executing check_s3_and_process...")
+        existing_objects = load_existing_metadata(csv_file_path)
+        current_objects = list_s3_objects(bucket_name)
+        print(f"Found {len(current_objects)} objects in S3 bucket.")
+        new_objects = [obj for obj in current_objects if obj['Key'] not in existing_objects]
 
-    if new_objects:
-        print(f"Found {len(new_objects)} new objects.")
-    else:
-        print("No new objects found.")
+        if new_objects:
+            print(f"Found {len(new_objects)} new objects.")
+        else:
+            print("No new objects found.")
 
-    for new_object in new_objects:
-        file_name = new_object['Key']
-        local_file_path = os.path.join('/tmp', file_name)  # Temporary local path
-        print(f"Downloading {file_name}...")
-        s3_client.download_file(bucket_name, file_name, local_file_path)
-        print(f"Uploading {file_name} to MongoDB...")
-        upload_json_to_mongodb(local_file_path, mongo_uri, database_name)
-        os.remove(local_file_path)  # Clean up the local file after uploading
+        for new_object in new_objects:
+            file_name = new_object['Key']
+            local_file_path = os.path.join('/tmp', file_name)  # Temporary local path
+            print(f"Downloading {file_name}...")
+            s3_client.download_file(bucket_name, file_name, local_file_path)
+            print(f"Uploading {file_name} to MongoDB...")
+            upload_json_to_mongodb(local_file_path, mongo_uri, database_name)
+            os.remove(local_file_path)  # Clean up the local file after uploading
 
-    print("S3 check and processing completed.")
+        print("S3 check and processing completed.")
+    except Exception as e:
+        print(f"Error occurred: {e}")
+
 
 
 @asynccontextmanager
